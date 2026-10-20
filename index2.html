@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PARFUM · 香水作品集</title>
+<style>
+:root{
+  --pink:#ff6fa5; --pink-soft:#ffb3cc; --pink-deep:#c2185b;
+  --ink:#1a1216; --glass:rgba(255,255,255,.10); --glass-strong:rgba(255,255,255,.18);
+  --line:rgba(255,111,165,.35);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;color:#fff;
+  background:radial-gradient(circle at 20% 10%,#4a1c33 0,transparent 45%),
+             radial-gradient(circle at 85% 80%,#6d2145 0,transparent 50%),
+             linear-gradient(160deg,#1a0e14,#2a1220 50%,#160a10);
+  min-height:100vh;overflow-x:hidden;
+}
+/* 加载页 */
+#loader{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:24px;
+  background:linear-gradient(160deg,#1a0e14,#2a1220 60%,#160a10);
+  transition:opacity .6s ease,visibility .6s;}
+#loader.hide{opacity:0;visibility:hidden}
+.loader-bottle{width:70px;height:120px;position:relative;border:3px solid var(--pink-soft);
+  border-radius:10px 10px 14px 14px;overflow:hidden;}
+.loader-bottle::before{content:"";position:absolute;left:0;right:0;bottom:0;height:0;
+  background:linear-gradient(180deg,var(--pink),var(--pink-deep));animation:fill 1.6s ease forwards;}
+@keyframes fill{to{height:88%}}
+.loader-cap{width:26px;height:18px;border-radius:4px;background:var(--pink);margin-bottom:-4px}
+.loader-text{font-size:12px;letter-spacing:4px;color:var(--pink-soft);animation:breathe 1.4s infinite}
+@keyframes breathe{0%,100%{opacity:.5}50%{opacity:1}}
+/* 滚动进度条 */
+#progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:120;
+  background:linear-gradient(90deg,var(--pink),var(--pink-soft));box-shadow:0 0 12px var(--pink)}
+/* 鼠标光晕 */
+#cursor-glow{position:fixed;width:260px;height:260px;border-radius:50%;pointer-events:none;z-index:1;
+  background:radial-gradient(circle,rgba(255,111,165,.18),transparent 70%);
+  transform:translate(-50%,-50%);transition:opacity .3s;mix-blend-mode:screen}
+/* 粒子背景 */
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none}
+/* 玻璃层 */
+.glass-layer{position:fixed;inset:0;z-index:0;pointer-events:none;backdrop-filter:blur(2px);
+  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.01));}
+.bottle{position:fixed;z-index:0;pointer-events:none;opacity:.14;
+  filter:drop-shadow(0 0 30px rgba(255,111,165,.5));animation:float 9s ease-in-out infinite;
+  transition:transform .1s linear;}
+.bottle.b1{left:4%;top:18%;width:90px}
+.bottle.b2{right:6%;top:55%;width:130px;animation-delay:2s}
+.bottle.b3{left:45%;bottom:6%;width:70px;animation-delay:4s}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-22px) rotate(4deg)}}
+header{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
+  padding:14px 28px;background:rgba(26,18,22,.55);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);}
+.logo{font-weight:800;letter-spacing:3px;color:var(--pink-soft);font-size:18px}
+nav{display:flex;gap:26px;flex-wrap:wrap}
+nav .group{display:flex;gap:14px;align-items:center;padding-left:20px;border-left:1px solid var(--line)}
+nav .group:first-child{border-left:none;padding-left:0}
+nav .g-label{font-size:11px;letter-spacing:2px;color:var(--pink);opacity:.8;text-transform:uppercase}
+nav a{color:#fff;text-decoration:none;font-size:14px;opacity:.85;transition:.25s;position:relative}
+nav a:hover{opacity:1;color:var(--pink-soft)}
+nav a::after{content:"";position:absolute;left:0;bottom:-4px;width:0;height:2px;background:var(--pink);transition:.25s}
+nav a:hover::after{width:100%}
+nav a.active{opacity:1;color:var(--pink-soft)}
+nav a.active::after{width:100%}
+/* 音乐按钮 + 可视化 */
+.music-wrap{position:fixed;right:22px;bottom:22px;z-index:60;display:flex;align-items:flex-end;gap:10px}
+.music-btn{width:52px;height:52px;border-radius:50%;border:1px solid var(--line);
+  background:rgba(255,111,165,.18);backdrop-filter:blur(10px);color:#fff;font-size:20px;cursor:pointer;transition:.3s;}
+.music-btn:hover{background:rgba(255,111,165,.4);transform:scale(1.08)}
+.music-btn.playing{box-shadow:0 0 24px var(--pink)}
+.viz{display:flex;align-items:flex-end;gap:3px;height:30px;opacity:0;transition:opacity .3s}
+.music-wrap.playing .viz{opacity:1}
+.viz span{width:4px;height:8px;background:var(--pink-soft);border-radius:2px;animation:viz 1s infinite ease-in-out}
+.viz span:nth-child(2){animation-delay:.15s}
+.viz span:nth-child(3){animation-delay:.3s}
+.viz span:nth-child(4){animation-delay:.45s}
+.viz span:nth-child(5){animation-delay:.6s}
+@keyframes viz{0%,100%{height:6px}50%{height:26px}}
+main{position:relative;z-index:2;max-width:1180px;margin:0 auto;padding:36px 24px 0}
+.page{display:none;padding-bottom:40px}
+.page.active{display:block;animation:sprayIn .6s cubic-bezier(.2,.8,.2,1)}
+@keyframes sprayIn{0%{opacity:0;transform:scale(.97);filter:blur(8px)}60%{opacity:1;filter:blur(1px)}100%{transform:scale(1);filter:blur(0)}}
+h1{font-size:clamp(34px,6vw,64px);line-height:1.05;letter-spacing:-1px;margin-bottom:18px}
+h1 span{color:var(--pink)}
+.sub{color:var(--pink-soft);font-size:15px;letter-spacing:2px;margin-bottom:28px}
+.hero{position:relative;min-height:66vh;display:flex;flex-direction:column;justify-content:center;
+  padding:44px 34px;border-radius:22px;overflow:hidden;
+  background:linear-gradient(120deg,rgba(255,111,165,.22),rgba(26,18,22,.4));border:1px solid var(--line);}
+.hero::before{content:"";position:absolute;inset:0;
+  background:radial-gradient(circle at 70% 30%,rgba(255,179,204,.35),transparent 55%);animation:heroBreathe 6s ease-in-out infinite;}
+@keyframes heroBreathe{0%,100%{opacity:.6}50%{opacity:1}}
+.hero>*{position:relative;z-index:2}
+.hero p{margin-top:10px;color:#f3dbe5;max-width:560px;line-height:1.7}
+.scroll-hint{margin-top:36px;font-size:12px;letter-spacing:3px;color:var(--pink-soft);animation:bounce 1.8s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
+.bio-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:28px;align-items:start}
+.bio-card{padding:28px;border-radius:20px;background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(12px);line-height:1.85}
+.bio-card p{margin-bottom:16px;color:#f0dbe3}
+.avatar-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;margin-bottom:20px}
+.avatar{width:120px;height:120px;border-radius:50%;background:linear-gradient(160deg,var(--pink),var(--pink-deep));
+  border:3px solid var(--pink-soft);box-shadow:0 0 0 6px rgba(255,111,165,.15),0 12px 30px rgba(255,111,165,.35);
+  display:flex;align-items:center;justify-content:center;font-size:48px;overflow:hidden;}
+.signature{font-family:"Segoe Script","Brush Script MT",cursive;font-size:26px;color:var(--pink-soft);letter-spacing:2px;text-align:center}
+.bio-img{height:320px;border-radius:20px;background:linear-gradient(160deg,var(--pink-deep),#3a1526 70%);
+  display:flex;align-items:center;justify-content:center;font-size:64px;border:1px solid var(--line)}
+.ph{position:relative;border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;
+  color:rgba(255,255,255,.85);background:linear-gradient(160deg,var(--pink-deep),#2b1420);
+  cursor:pointer;transition:.3s;border:1px solid var(--line);overflow:hidden}
+.ph:hover{transform:scale(1.03);box-shadow:0 12px 30px rgba(255,111,165,.25)}
+.ph .scent{position:absolute;left:0;right:0;bottom:0;padding:8px 10px;font-size:11px;letter-spacing:2px;
+  background:linear-gradient(0deg,rgba(26,18,22,.9),transparent);color:var(--pink-soft);
+  transform:translateY(100%);transition:.3s;text-align:left;font-weight:400}
+.ph:hover .scent{transform:translateY(0)}
+.page.active .ph,.page.active .num{animation:numIn .5s forwards;opacity:0;transform:translateY(10px)}
+@keyframes numIn{to{opacity:1;transform:none}}
+.page.active .ph:nth-child(1),.page.active .num:nth-child(1){animation-delay:.05s}
+.page.active .ph:nth-child(2),.page.active .num:nth-child(2){animation-delay:.12s}
+.page.active .ph:nth-child(3),.page.active .num:nth-child(3){animation-delay:.19s}
+.page.active .ph:nth-child(4),.page.active .num:nth-child(4){animation-delay:.26s}
+.page.active .ph:nth-child(5),.page.active .num:nth-child(5){animation-delay:.33s}
+.page.active .ph:nth-child(6),.page.active .num:nth-child(6){animation-delay:.40s}
+.spread{display:grid;grid-template-columns:1fr 1fr;gap:0;border-radius:18px;overflow:hidden;border:1px solid var(--line);background:rgba(0,0,0,.2)}
+.spread .left-page,.spread .right-page{padding:22px;display:grid;gap:14px}
+.spread .left-page{border-right:1px dashed var(--line)}
+.spread .ph{height:260px}
+.spread .num{font-size:12px;letter-spacing:3px;color:var(--pink-soft);margin-top:6px}
+.pyramid{display:flex;flex-direction:column;align-items:center;gap:18px}
+.pyramid .tier{display:flex;justify-content:center;gap:16px;flex-wrap:wrap}
+.pyramid .tier.top{width:40%}.pyramid .tier.mid{width:70%}.pyramid .tier.base{width:100%}
+.pyramid .ph{height:170px;width:170px}
+.tier-label{font-size:12px;letter-spacing:3px;color:var(--pink);text-align:center;margin-bottom:6px}
+.feature-wrap{display:grid;grid-template-columns:1.6fr 1fr;gap:20px}
+.feature-main .ph{height:420px}
+.feature-side{display:grid;grid-template-rows:repeat(3,1fr);gap:14px}
+.feature-side .ph{min-height:120px}
+.feature-title{margin-top:14px;font-size:20px;color:var(--pink-soft)}
+.feature-sub{font-size:13px;opacity:.75;margin-top:4px}
+.brand-wall{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px}
+.brand-wall .ph{height:160px;background:linear-gradient(160deg,#3a1526,#1a0e14)}
+.brand-wall .name{margin-top:8px;font-size:13px;letter-spacing:1px;color:var(--pink-soft);text-align:center}
+.acc-item{border-bottom:1px solid var(--line)}
+.acc-head{display:flex;justify-content:space-between;align-items:center;padding:20px 6px;cursor:pointer;font-size:16px;transition:.25s}
+.acc-head:hover{color:var(--pink-soft)}
+.acc-head .mark{color:var(--pink);font-size:20px;transition:.3s}
+.acc-item.open .mark{transform:rotate(45deg)}
+.acc-body{max-height:0;overflow:hidden;transition:max-height .35s ease;opacity:.85;line-height:1.8;font-size:14px}
+.acc-body p{padding:0 6px 20px}
+.price-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px}
+.price-card{position:relative;padding:30px 24px;border-radius:22px;background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(12px);transition:.3s}
+.price-card:hover{transform:translateY(-8px);border-color:var(--pink);box-shadow:0 18px 40px rgba(255,111,165,.2)}
+.price-card .tier{font-size:12px;letter-spacing:3px;color:var(--pink);text-transform:uppercase}
+.price-card .amount{font-size:34px;font-weight:800;margin:12px 0}
+.price-card ul{list-style:none;font-size:13px;line-height:2;opacity:.85}
+.price-card ul li::before{content:"◆ ";color:var(--pink)}
+.price-card .note{margin-top:14px;font-size:12px;opacity:.6}
+.price-card .btn{display:inline-block;margin-top:20px;padding:10px 22px;border-radius:30px;background:var(--pink);
+  color:#1a0e14;font-weight:700;text-decoration:none;font-size:14px}
+.price-card .btn:hover{background:var(--pink-soft)}
+.next-guide{position:relative;z-index:2;margin-top:50px;padding:48px 24px 80px;text-align:center;
+  border-top:1px solid var(--line);background:linear-gradient(180deg,transparent,rgba(255,111,165,.08));}
+.next-guide .big{font-size:clamp(28px,5vw,48px);font-weight:800;color:rgba(255,179,204,.5);letter-spacing:4px}
+.next-guide .arrow{margin-top:18px;font-size:26px;color:var(--pink);animation:bounce 1.8s infinite;cursor:pointer}
+footer{position:relative;z-index:2;text-align:center;padding:30px 20px;border-top:1px solid var(--line);
+  color:rgba(255,255,255,.55);font-size:13px;letter-spacing:2px;background:rgba(26,18,22,.4)}
+.lightbox{position:fixed;inset:0;z-index:100;display:none;background:rgba(10,6,8,.92);backdrop-filter:blur(8px);
+  align-items:center;justify-content:center}
+.lightbox.open{display:flex}
+.lightbox .stage{width:min(80vw,560px);height:min(80vh,760px);border-radius:18px;
+  background:linear-gradient(160deg,var(--pink-deep),#2b1420);display:flex;align-items:center;justify-content:center;
+  font-size:48px;font-weight:800;color:#fff;position:relative;border:1px solid var(--line)}
+.lb-btn{position:absolute;top:50%;transform:translateY(-50%);width:52px;height:52px;border-radius:50%;
+  border:1px solid var(--line);background:rgba(255,111,165,.2);color:#fff;font-size:22px;cursor:pointer}
+.lb-btn:hover{background:rgba(255,111,165,.45)}
+.lb-prev{left:-72px}.lb-next{right:-72px}
+.lb-close{position:absolute;top:24px;right:28px;font-size:30px;color:#fff;cursor:pointer;background:none;border:none}
+.lb-count{position:absolute;bottom:-40px;left:50%;transform:translateX(-50%);font-size:13px;letter-spacing:2px;color:var(--pink-soft)}
+/* 调香浮窗 */
+.game-overlay{position:fixed;inset:0;z-index:150;display:none;align-items:center;justify-content:center;
+  background:rgba(10,6,8,.75);backdrop-filter:blur(8px);padding:20px}
+.game-overlay.open{display:flex}
+.game-card{position:relative;width:min(92vw,560px);max-height:90vh;overflow-y:auto;
+  padding:30px 26px;border-radius:24px;background:linear-gradient(160deg,rgba(58,21,38,.95),rgba(26,14,20,.98));
+  border:1px solid var(--line);box-shadow:0 24px 60px rgba(255,111,165,.25);animation:sprayIn .5s}
+.game-skip{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--pink-soft);font-size:13px;cursor:pointer;letter-spacing:1px}
+.game-head h2{font-size:26px;margin-bottom:6px}
+.game-head h2 span{color:var(--pink)}
+.game-head p{font-size:13px;opacity:.7;margin-bottom:20px}
+.game-scents{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.scent-chip{padding:14px 8px;border-radius:14px;text-align:center;font-size:13px;cursor:pointer;
+  background:var(--glass);border:1px solid var(--line);transition:.25s;user-select:none}
+.scent-chip:hover{background:var(--glass-strong)}
+.scent-chip.on{background:rgba(255,111,165,.35);border-color:var(--pink);box-shadow:0 0 16px rgba(255,111,165,.4)}
+.game-picked{font-size:12px;letter-spacing:2px;color:var(--pink-soft);margin-bottom:14px;text-align:center}
+.game-make{display:block;width:100%;padding:13px;border-radius:30px;border:none;cursor:pointer;
+  background:var(--pink);color:#1a0e14;font-weight:800;font-size:15px;letter-spacing:2px;transition:.3s}
+.game-make:disabled{opacity:.35;cursor:not-allowed}
+.game-make:not(:disabled):hover{background:var(--pink-soft)}
+.game-result{display:none;margin-top:22px;text-align:center;animation:fade .5s}
+.game-result.show{display:block}
+.result-bottle{width:110px;height:150px;margin:0 auto 16px;border-radius:12px 12px 18px 18px;
+  position:relative;border:3px solid rgba(255,255,255,.5);overflow:hidden}
+.result-name{font-size:22px;font-weight:800;color:var(--pink-soft);margin-bottom:8px}
+.result-desc{font-size:13px;line-height:1.8;opacity:.85;max-width:380px;margin:0 auto}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@media(max-width:760px){
+  nav{gap:12px}nav .group{padding-left:12px;gap:10px}
+  .bio-grid,.feature-wrap,.spread{grid-template-columns:1fr}
+  .spread .left-page{border-right:none;border-bottom:1px dashed var(--line)}
+  .pyramid .tier.top,.pyramid .tier.mid{width:100%}
+  .lb-prev{left:8px}.lb-next{right:8px}.lb-btn{width:44px;height:44px}
+  #cursor-glow{display:none}
+  .game-scents{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<div id="loader">
+  <div class="loader-cap"></div>
+  <div class="loader-bottle"></div>
+  <div class="loader-text">PARFUM · 调香中</div>
+</div>
+
+<div id="progress"></div>
+<div id="cursor-glow"></div>
+<canvas id="particles"></canvas>
+<div class="glass-layer"></div>
+<svg class="bottle b1" viewBox="0 0 100 160"><rect x="30" y="30" width="40" height="110" rx="10" fill="#ffb3cc"/><rect x="40" y="10" width="20" height="24" rx="4" fill="#ff6fa5"/><rect x="36" y="70" width="28" height="30" rx="3" fill="#ff6fa5" opacity=".7"/></svg>
+<svg class="bottle b2" viewBox="0 0 100 160"><rect x="28" y="26" width="44" height="118" rx="14" fill="#ffb3cc"/><rect x="42" y="6" width="16" height="22" rx="4" fill="#ff6fa5"/><circle cx="50" cy="86" r="14" fill="#ff6fa5" opacity=".6"/></svg>
+<svg class="bottle b3" viewBox="0 0 100 160"><rect x="32" y="34" width="36" height="104" rx="8" fill="#ffb3cc"/><rect x="42" y="12" width="16" height="24" rx="3" fill="#ff6fa5"/></svg>
+
+<header>
+  <div class="logo">PARFUM · 香</div>
+  <nav>
+    <div class="group"><span class="g-label">关于</span>
+      <a href="#" data-page="bio">自介</a><a href="#" data-page="notice">须知</a></div>
+    <div class="group"><span class="g-label">展示</span>
+      <a href="#" data-page="talk">话术</a><a href="#" data-page="review">板评</a>
+      <a href="#" data-page="feature">头牌</a><a href="#" data-page="brand">冠名</a></div>
+    <div class="group"><span class="g-label">报价</span>
+      <a href="#" data-page="price">价格</a></div>
+  </nav>
+</header>
+
+<main>
+<section class="page active" id="page-home">
+  <div class="hero">
+    <p class="sub">EAU DE PORTFOLIO · 2026</p>
+    <h1>气味是<span>看不见的作品集</span></h1>
+    <p>像翻开一本香水杂志：前调是自我介绍，中调是作品与评价，后调留给价格与冠名。向下滚动，逐页闻香。</p>
+    <div class="scroll-hint">↓ 向下滑动 · SCROLL</div>
+  </div>
+</section>
+
+<section class="page" id="page-bio">
+  <h1>关于<span>我</span></h1>
+  <p class="sub">SELF · 风格宣言</p>
+  <div class="bio-grid">
+    <div class="bio-card">
+      <div class="avatar-wrap">
+        <div class="avatar">🧴</div>
+        <div class="signature">粉而不腻，透而不空</div>
+      </div>
+      <p>我是做香水内容与卡面展示的创作者，偏爱粉红、玻璃质感和一切带气味记忆的东西。这里是我的作品集，也是一瓶调了很久的香。</p>
+      <p>我相信表达应该像前调一样直接，像中调一样耐看，像后调一样留得住。每一份作品都按香调逻辑去组织，不堆砌，不敷衍。</p>
+      <p>风格宣言：粉而不腻，透而不空，锋利但不伤人。</p>
+    </div>
+    <div class="bio-img">🌸</div>
+  </div>
+</section>
+
+<section class="page" id="page-talk">
+  <h1>话术<span>跨页</span></h1>
+  <p class="sub">TALK · 复古香水广告</p>
+  <div class="spread">
+    <div class="left-page">
+      <div class="ph" data-lb="talk" data-i="0">NO.01<span class="scent">前调 · 柑橘 / 粉红胡椒</span></div><div class="num">T-001</div>
+      <div class="ph" data-lb="talk" data-i="1">NO.02<span class="scent">中调 · 玫瑰 / 牡丹</span></div><div class="num">T-002</div>
+    </div>
+    <div class="right-page">
+      <div class="ph" data-lb="talk" data-i="2">NO.03<span class="scent">中调 · 鸢尾 / 紫罗兰</span></div><div class="num">T-003</div>
+      <div class="ph" data-lb="talk" data-i="3">NO.04<span class="scent">后调 · 麝香 / 琥珀</span></div><div class="num">T-004</div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-notice">
+  <h1>须知<span>规则</span></h1>
+  <p class="sub">NOTICE · 请先阅读</p>
+  <div id="accList"></div>
+  <p style="margin-top:24px;font-size:12px;opacity:.6;letter-spacing:1px">※ 以上规则最终解释权归本作品集所有。</p>
+</section>
+
+<section class="page" id="page-review">
+  <h1>板评<span>金字塔</span></h1>
+  <p class="sub">REVIEW · 香调结构</p>
+  <div class="pyramid">
+    <div><div class="tier-label">前调 · TOP</div><div class="tier top">
+      <div class="ph" data-lb="review" data-i="0">R-01<span class="scent">前调 · 佛手柑</span></div></div></div>
+    <div><div class="tier-label">中调 · HEART</div><div class="tier mid">
+      <div class="ph" data-lb="review" data-i="1">R-02<span class="scent">中调 · 玫瑰</span></div>
+      <div class="ph" data-lb="review" data-i="2">R-03<span class="scent">中调 · 茉莉</span></div></div></div>
+    <div><div class="tier-label">后调 · BASE</div><div class="tier base">
+      <div class="ph" data-lb="review" data-i="3">R-04<span class="scent">后调 · 雪松</span></div>
+      <div class="ph" data-lb="review" data-i="4">R-05<span class="scent">后调 · 香草</span></div>
+      <div class="ph" data-lb="review" data-i="5">R-06<span class="scent">后调 · 白麝香</span></div></div></div>
+  </div>
+</section>
+
+<section class="page" id="page-feature">
+  <h1>头牌<span>主推</span></h1>
+  <p class="sub">FEATURE · 本期主推</p>
+  <div class="feature-wrap">
+    <div class="feature-main">
+      <div class="ph" data-lb="feature" data-i="0">NO.01<span class="scent">玫瑰 / 麝香 / 琥珀</span></div>
+      <div class="feature-title">午夜粉雾 · Midnight Rose</div>
+      <div class="feature-sub">编号 F-001 ｜ 主推卡面 ｜ 香调：玫瑰 / 麝香 / 琥珀</div>
+    </div>
+    <div class="feature-side" id="featureSide"></div>
+  </div>
+</section>
+
+<section class="page" id="page-brand">
+  <h1>冠名<span>品牌墙</span></h1>
+  <p class="sub">SPONSOR · 感谢冠名</p>
+  <div class="brand-wall" id="brandWall"></div>
+</section>
+
+<section class="page" id="page-price">
+  <h1>价格<span>价目</span></h1>
+  <p class="sub">PRICE · 按香调选档</p>
+  <div class="price-grid">
+    <div class="price-card"><div class="tier">前调 · 基础</div><div class="amount">¥199</div>
+      <ul><li>单张卡面</li><li>1 次修改</li><li>7 天交付</li></ul><div class="note">适合轻量尝试</div><a href="#" class="btn">联系我</a></div>
+    <div class="price-card"><div class="tier">中调 · 进阶</div><div class="amount">¥499</div>
+      <ul><li>3 张卡面</li><li>2 次修改</li><li>5 天交付</li></ul><div class="note">最受欢迎档位</div><a href="#" class="btn">联系我</a></div>
+    <div class="price-card"><div class="tier">后调 · 定制</div><div class="amount">¥999+</div>
+      <ul><li>整套视觉</li><li>无限修改</li><li>专属香调命名</li></ul><div class="note">按需求单独报价</div><a href="#" class="btn">联系我</a></div>
+  </div>
+</section>
+
+<div class="next-guide">
+  <div class="big">NEXT · 下一段香气</div>
+  <div class="arrow" id="nextArrow">↓</div>
+</div>
+</main>
+
+<footer>© 2026 PARFUM PORTFOLIO · 粉红与玻璃之间，气味自有回声。</footer>
+
+<div class="music-wrap" id="musicWrap">
+  <div class="viz"><span></span><span></span><span></span><span></span><span></span></div>
+  <button class="music-btn" id="musicBtn" title="播放/暂停背景音乐">♪</button>
+</div>
+<audio id="bgm" loop preload="none"><source src="jazz.mp3" type="audio/mpeg"></audio>
+
+<div class="lightbox" id="lightbox">
+  <button class="lb-close" id="lbClose">×</button>
+  <div class="stage" id="lbStage">NO.01
+    <button class="lb-btn lb-prev" id="lbPrev">‹</button>
+    <button class="lb-btn lb-next" id="lbNext">›</button>
+    <div class="lb-count" id="lbCount"></div>
+  </div>
+</div>
+
+<!-- 调香互动浮窗 -->
+<div class="game-overlay" id="gameOverlay">
+  <div class="game-card">
+    <button class="game-skip" id="gameSkip">跳过 ×</button>
+    <div class="game-head">
+      <h2>调一瓶<span>你的香</span></h2>
+      <p>选 3 个香调，生成专属香水</p>
+    </div>
+    <div class="game-scents" id="gameScents"></div>
+    <div class="game-picked" id="gamePicked">已选 0 / 3</div>
+    <button class="game-make" id="gameMake" disabled>调香</button>
+    <div class="game-result" id="gameResult"></div>
+  </div>
+</div>
+
+<script>
+/* 加载页 + 结束后弹出调香浮窗 */
+window.addEventListener('load',()=>{
+  const loader=document.getElementById('loader');
+  setTimeout(()=>{
+    loader.classList.add('hide');
+    setTimeout(()=>{
+      document.getElementById('gameOverlay').classList.add('open');
+    },500);
+  },1700);
+});
+/* 滚动进度条 */
+const progress=document.getElementById('progress');
+window.addEventListener('scroll',()=>{
+  const h=document.documentElement.scrollHeight-window.innerHeight;
+  progress.style.width=(window.scrollY/h*100)+'%';
+},{passive:true});
+/* 鼠标光晕 */
+const glow=document.getElementById('cursor-glow');
+window.addEventListener('mousemove',e=>{glow.style.left=e.clientX+'px';glow.style.top=e.clientY+'px';});
+/* 粒子背景 */
+const canvas=document.getElementById('particles'),ctx=canvas.getContext('2d');
+let W,H,parts=[];
+function resize(){W=canvas.width=innerWidth;H=canvas.height=innerHeight;}
+resize();window.addEventListener('resize',resize);
+for(let i=0;i<40;i++){
+  parts.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*2+1,
+    vy:Math.random()*.4+.1,vx:(Math.random()-.5)*.2,o:Math.random()*.5+.2});
+}
+function drawParticles(){
+  ctx.clearRect(0,0,W,H);
+  parts.forEach(p=>{
+    p.y-=p.vy;p.x+=p.vx;
+    if(p.y<0){p.y=H;p.x=Math.random()*W;}
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,179,204,'+p.o+')';ctx.fill();
+  });
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+/* 页面切换 */
+const order=['home','bio','talk','notice','review','feature','brand','price'];
+const pages=document.querySelectorAll('.page');
+function setNav(id){document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('active',a.dataset.page===id));}
+function showPage(id){
+  pages.forEach(p=>p.classList.toggle('active',p.id==='page-'+id));
+  setNav(id);window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('[data-page]').forEach(el=>{
+  el.addEventListener('click',e=>{e.preventDefault();showPage(el.dataset.page);});
+});
+setNav('home');
+/* 香水瓶滚动视差 */
+const bottles=document.querySelectorAll('.bottle');
+window.addEventListener('scroll',()=>{
+  const y=window.scrollY;
+  bottles.forEach((b,i)=>{const speed=0.08+i*0.04;
+    b.style.transform=`translateY(${y*speed}px) rotate(${Math.sin(y/300+i)*4}deg)`;});
+},{passive:true});
+/* 下方引导 */
+document.getElementById('nextArrow').addEventListener('click',()=>{
+  const cur=document.querySelector('.page.active').id.replace('page-','');
+  const idx=order.indexOf(cur);showPage(order[(idx+1)%order.length]);
+});
+/* 须知手风琴 */
+const accData=[
+  ['一、禁止二次转售','成稿仅限本人使用，禁止转售、倒卖或作为素材二次分发。'],
+  ['二、禁止冒名发布','禁止以他人名义发布作品，署名权归创作者所有。'],
+  ['三、禁止商用未授权','商用、印刷、周边需提前沟通并单独授权。'],
+  ['四、禁止恶意修改','禁止篡改作品核心元素后宣称原创。'],
+  ['五、禁止违法用途','任何违法、侵权、违背公序良俗的用途一律拒绝。']
+];
+const accList=document.getElementById('accList');
+accData.forEach(([t,b],i)=>{
+  const item=document.createElement('div');
+  item.className='acc-item'+(i===0?' open':'');
+  item.innerHTML=`<div class="acc-head"><span>${t}</span><span class="mark">+</span></div><div class="acc-body"><p>${b}</p></div>`;
+  accList.appendChild(item);
+});
+accList.querySelectorAll('.acc-head').forEach(h=>{
+  h.addEventListener('click',()=>{
+    const item=h.parentElement,body=item.querySelector('.acc-body');
+    const open=item.classList.toggle('open');
+    body.style.maxHeight=open?body.scrollHeight+'px':0;
+  });
+});
+setTimeout(()=>{const f=accList.querySelector('.acc-item.open .acc-body');if(f)f.style.maxHeight=f.scrollHeight+'px';},50);
+/* 头牌侧栏 */
+const featureSide=document.getElementById('featureSide');
+for(let i=2;i<=4;i++){
+  const d=document.createElement('div');d.className='ph';
+  d.dataset.lb='feature';d.dataset.i=i-1;
+  d.innerHTML='NO.0'+i+'<span class="scent">'+(['玫瑰','麝香','琥珀'][i-2])+'</span>';
+  featureSide.appendChild(d);
+}
+/* 冠名 */
+const brandWall=document.getElementById('brandWall');
+for(let i=1;i<=6;i++){
+  const d=document.createElement('div');
+  d.innerHTML=`<div class="ph" data-lb="brand" data-i="${i-1}">B-00${i}<span class="scent">冠名合作 · 香调联名</span></div><div class="name">冠名方 0${i}</div>`;
+  brandWall.appendChild(d);
+}
+/* 放大预览 */
+const lb=document.getElementById('lightbox'),lbStage=document.getElementById('lbStage'),lbCount=document.getElementById('lbCount');
+const groups={talk:{n:4,label:i=>'NO.0'+(i+1)},review:{n:6,label:i=>'R-0'+(i+1)},
+  feature:{n:4,label:i=>'NO.0'+(i+1)},brand:{n:6,label:i=>'B-00'+(i+1)}};
+let curGroup='talk',curIndex=0;
+function renderLb(){const g=groups[curGroup];lbStage.firstChild.nodeValue=g.label(curIndex);lbCount.textContent=(curIndex+1)+' / '+g.n;}
+document.querySelectorAll('[data-lb]').forEach(el=>{
+  el.addEventListener('click',()=>{curGroup=el.dataset.lb;curIndex=+el.dataset.i;lb.classList.add('open');renderLb();});
+});
+document.getElementById('lbPrev').addEventListener('click',e=>{e.stopPropagation();const g=groups[curGroup];curIndex=(curIndex-1+g.n)%g.n;renderLb();});
+document.getElementById('lbNext').addEventListener('click',e=>{e.stopPropagation();const g=groups[curGroup];curIndex=(curIndex+1)%g.n;renderLb();});
+document.getElementById('lbClose').addEventListener('click',()=>lb.classList.remove('open'));
+lb.addEventListener('click',e=>{if(e.target===lb)lb.classList.remove('open');});
+document.addEventListener('keydown',e=>{
+  if(!lb.classList.contains('open'))return;
+  if(e.key==='Escape')lb.classList.remove('open');
+  if(e.key==='ArrowLeft')document.getElementById('lbPrev').click();
+  if(e.key==='ArrowRight')document.getElementById('lbNext').click();
+});
+/* 背景音乐 + 可视化 */
+const bgm=document.getElementById('bgm'),musicBtn=document.getElementById('musicBtn'),musicWrap=document.getElementById('musicWrap');
+musicBtn.addEventListener('click',()=>{
+  if(bgm.paused){
+    bgm.play().then(()=>{musicBtn.classList.add('playing');musicWrap.classList.add('playing');})
+    .catch(()=>alert('未找到音频文件，请把 jazz.mp3 放到同目录，或修改 <source> 的 src。'));
+  }else{
+    bgm.pause();musicBtn.classList.remove('playing');musicWrap.classList.remove('playing');
+  }
+});
+/* 调香小游戏 */
+const scents=['佛手柑','粉红胡椒','玫瑰','牡丹','鸢尾','茉莉','雪松','麝香','琥珀','香草','白麝香','紫罗兰'];
+const gameScents=document.getElementById('gameScents');
+const gamePicked=document.getElementById('gamePicked');
+const gameMake=document.getElementById('gameMake');
+const gameResult=document.getElementById('gameResult');
+let picked=[];
+scents.forEach(s=>{
+  const c=document.createElement('div');
+  c.className='scent-chip';c.textContent=s;
+  c.addEventListener('click',()=>{
+    if(c.classList.contains('on')){c.classList.remove('on');picked=picked.filter(x=>x!==s);}
+    else{
+      if(picked.length>=3)return;
+      c.classList.add('on');picked.push(s);
+    }
+    gamePicked.textContent=`已选 ${picked.length} / 3`;
+    gameMake.disabled=picked.length!==3;
+  });
+  gameScents.appendChild(c);
+});
+const nameParts=['午夜','粉雾','琥珀','初雪','暗涌','微醺','雾光','丝绒'];
+function makePerfume(){
+  const n=nameParts[Math.floor(Math.random()*nameParts.length)]+scents[Math.floor(Math.random()*scents.length)];
+  const desc=picked.join(' / ')+'。像一段没说完的话，在皮肤上慢慢展开，前调清透，中调柔软，后调收得干净，留下一点粉红色的回声。';
+  const c1='hsl('+(320+Math.random()*40)+',80%,60%)';
+  const c2='hsl('+(280+Math.random()*60)+',60%,30%)';
+  gameResult.innerHTML=`<div class="result-bottle" style="background:linear-gradient(160deg,${c1},${c2})"></div>
+    <div class="result-name">${n}</div><div class="result-desc">${desc}</div>`;
+  gameResult.classList.add('show');
+  gameMake.textContent='再来一瓶';
+  gameMake.disabled=false;
+  gameMake.onclick=()=>{gameResult.classList.remove('show');picked=[];
+    document.querySelectorAll('.scent-chip').forEach(c=>c.classList.remove('on'));
+    gamePicked.textContent='已选 0 / 3';gameMake.textContent='调香';gameMake.disabled=true;gameMake.onclick=makePerfume;};
+}
+gameMake.onclick=makePerfume;
+document.getElementById('gameSkip').addEventListener('click',()=>document.getElementById('gameOverlay').classList.remove('open'));
+</script>
+</body>
+</html>
