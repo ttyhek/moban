@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIN NOIR · 品酒档案</title>
+<style>
+:root{--black:#0a0708;--black-2:#120c0e;--red:#c8102e;--red-soft:#e23a52;--red-dim:#7a0c1c;--ink:#e8e2e0;--ink-dim:#9a8f8d;--line:rgba(200,16,46,.35);--font-title:"Impact","Arial Black","Noto Sans SC",sans-serif;--font-body:"Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;--maxw:1180px}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--ink);font-family:var(--font-body);line-height:1.7;overflow-x:hidden;min-height:100vh}
+a{color:inherit;text-decoration:none}img{display:block;max-width:100%}
+.bg-glass{position:fixed;inset:0;z-index:0;pointer-events:none;display:flex;align-items:center;justify-content:center}
+.bg-glass svg{width:min(90vw,900px);height:auto;opacity:.07;animation:floatGlass 14s ease-in-out infinite;filter:drop-shadow(0 0 40px rgba(200,16,46,.35))}
+@keyframes floatGlass{0%,100%{transform:translateY(-12px) scale(1);opacity:.06}50%{transform:translateY(12px) scale(1.03);opacity:.1}}
+.bg-veil{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(circle at 50% 40%,transparent 0%,rgba(10,7,8,.55) 70%,rgba(10,7,8,.9) 100%)}
+.nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:14px clamp(16px,4vw,48px);background:linear-gradient(180deg,rgba(10,7,8,.92),rgba(10,7,8,.55));backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.logo{font-family:var(--font-title);font-size:22px;letter-spacing:2px}.logo b{color:var(--red)}
+.nav-right{display:flex;align-items:center;gap:18px}.nav-groups{display:flex;gap:26px;align-items:center}
+.nav-group{position:relative}.nav-group>span{cursor:pointer;font-size:14px;letter-spacing:1px;color:var(--ink-dim);padding:6px 0;display:inline-block;transition:color .2s}
+.nav-group:hover>span{color:var(--red-soft)}
+.nav-drop{position:absolute;top:130%;left:50%;transform:translate(-50%,8px);background:var(--black-2);border:1px solid var(--line);min-width:150px;padding:8px 0;border-radius:6px;opacity:0;visibility:hidden;transition:.22s;box-shadow:0 12px 30px rgba(0,0,0,.6)}
+.nav-group:hover .nav-drop{opacity:1;visibility:visible;transform:translate(-50%,0)}
+.nav-drop a{display:block;padding:8px 18px;font-size:14px;color:var(--ink-dim);transition:.18s;cursor:pointer}
+.nav-drop a:hover{color:#fff;background:rgba(200,16,46,.18);padding-left:24px}
+.nav-drop a.active{color:var(--red-soft)}
+.music-btn{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:rgba(200,16,46,.12);color:var(--red-soft);font-size:16px;cursor:pointer;display:grid;place-items:center;transition:.25s}
+.music-btn:hover{background:rgba(200,16,46,.3);box-shadow:0 0 16px rgba(200,16,46,.5)}
+.music-btn.playing{animation:pulseMusic 1.6s infinite}
+@keyframes pulseMusic{0%,100%{box-shadow:0 0 0 rgba(200,16,46,.4)}50%{box-shadow:0 0 18px rgba(200,16,46,.7)}}
+.burger{display:none;width:40px;height:40px;border:1px solid var(--line);background:none;color:var(--ink);font-size:18px;cursor:pointer;border-radius:6px}
+.mobile-menu{display:none;position:fixed;inset:64px 0 0;z-index:45;background:var(--black-2);padding:24px clamp(16px,6vw,40px);overflow-y:auto}
+.mobile-menu.show{display:block}.mobile-menu h4{color:var(--red-soft);font-size:13px;letter-spacing:2px;margin:18px 0 8px;text-transform:uppercase}
+.mobile-menu a{display:block;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06);color:var(--ink-dim);cursor:pointer}
+.footer{position:relative;z-index:2;margin-top:80px;padding:36px clamp(16px,4vw,48px);border-top:1px solid var(--line);text-align:center;color:var(--ink-dim);font-size:13px;letter-spacing:.5px;background:linear-gradient(0deg,rgba(200,16,46,.06),transparent)}
+.footer span{color:var(--red-soft)}
+.view{display:none}.view.active{display:block}
+.page{position:relative;z-index:2;max-width:var(--maxw);margin:0 auto;padding:110px clamp(16px,4vw,48px) 40px}
+.page-head{margin-bottom:44px}.page-head .kicker{color:var(--red);font-size:13px;letter-spacing:4px;text-transform:uppercase}
+.page-head h1{font-family:var(--font-title);font-size:clamp(38px,7vw,80px);line-height:.95;letter-spacing:1px;margin-top:8px}
+.page-head h1 em{color:var(--red);font-style:normal}.page-head .sub{margin-top:14px;color:var(--ink-dim);max-width:640px}
+.hero{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:120px clamp(16px,5vw,64px) 60px;max-width:var(--maxw);margin:0 auto}
+.hero .tag{color:var(--red);letter-spacing:6px;font-size:13px;text-transform:uppercase}
+.hero h1{font-family:var(--font-title);font-size:clamp(48px,12vw,140px);line-height:.88;letter-spacing:2px;margin:18px 0;text-shadow:0 0 40px rgba(200,16,46,.25)}
+.hero h1 em{color:var(--red);font-style:normal;display:inline-block;animation:glow 3s ease-in-out infinite}
+@keyframes glow{0%,100%{text-shadow:0 0 20px rgba(200,16,46,.3)}50%{text-shadow:0 0 40px rgba(200,16,46,.8)}}
+.hero p{max-width:560px;color:var(--ink-dim);font-size:clamp(15px,2vw,18px)}
+.hero .cta{margin-top:28px;display:inline-flex;align-items:center;gap:10px;padding:14px 30px;border:1px solid var(--red);border-radius:40px;color:var(--red-soft);letter-spacing:2px;font-size:14px;transition:.25s;width:fit-content;cursor:pointer}
+.hero .cta:hover{background:var(--red);color:#fff;box-shadow:0 0 30px rgba(200,16,46,.6)}
+.intro-block{position:relative;z-index:2;max-width:var(--maxw);margin:0 auto;padding:40px clamp(16px,4vw,48px) 20px;border-top:1px solid var(--line)}
+.intro-block h2{font-family:var(--font-title);font-size:clamp(24px,4vw,40px);margin-bottom:14px}.intro-block p{color:var(--ink-dim);max-width:720px}
+.cards-grid{position:relative;z-index:2;max-width:var(--maxw);margin:40px auto 0;padding:0 clamp(16px,4vw,48px);display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.entry-card{background:var(--black-2);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:22px;transition:.28s;position:relative;overflow:hidden;cursor:pointer}
+.entry-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--red);transform:scaleY(0);transform-origin:top;transition:.3s}
+.entry-card:hover::before{transform:scaleY(1)}.entry-card:hover{transform:translateY(-4px);border-color:var(--line);box-shadow:0 16px 36px rgba(200,16,46,.18)}
+.entry-card .num{color:var(--red);font-family:var(--font-title);font-size:14px;letter-spacing:2px}
+.entry-card h3{font-size:18px;margin:8px 0 6px}.entry-card p{font-size:13px;color:var(--ink-dim)}
+.about-wrap{display:grid;grid-template-columns:1fr 1.2fr;gap:48px;align-items:start}.about-img{position:relative}
+.about-img img{border:1px solid var(--line);border-radius:8px}
+.about-text h2{font-family:var(--font-title);font-size:32px;margin-bottom:8px}
+.about-text h2::after{content:"";display:block;width:60px;height:3px;background:var(--red);margin-top:10px}
+.about-text p{color:var(--ink-dim);margin-top:16px}
+.contact-list{margin-top:32px;display:flex;flex-direction:column;gap:12px}
+.contact-item{display:flex;align-items:center;gap:14px;padding:12px 18px;border:1px solid var(--line);border-radius:8px;transition:.25s;background:rgba(200,16,46,.05)}
+.contact-item:hover{background:rgba(200,16,46,.16);transform:translateX(6px)}
+.contact-item .ic{color:var(--red-soft);font-size:18px;min-width:24px}.contact-item span{color:var(--ink-dim);font-size:14px}
+.grid-scripts{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.grid-scripts .item{position:relative;cursor:pointer;overflow:hidden;border-radius:8px}
+.grid-scripts .item img{width:100%;aspect-ratio:3/4;object-fit:cover;transition:.5s}
+.grid-scripts .item:hover img{transform:scale(1.05)}
+.grid-scripts .item .big-num{position:absolute;top:8px;left:14px;font-family:var(--font-title);font-size:clamp(38px,7vw,64px);color:var(--red);opacity:.85;line-height:1;text-shadow:0 2px 12px rgba(0,0,0,.8)}
+.grid-scripts .item .bar{position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--red);transform:scaleX(0);transform-origin:left;transition:.4s}
+.grid-scripts .item:hover .bar{transform:scaleX(1)}
+.rules-list{display:flex;flex-direction:column;gap:14px;position:relative}
+.rule-item{background:var(--black-2);border:1px solid rgba(255,255,255,.08);border-radius:8px;overflow:hidden;position:relative;clip-path:polygon(0 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%)}
+.rule-item::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--red)}
+.rule-head{display:flex;align-items:center;gap:16px;padding:20px 22px;cursor:pointer;user-select:none}
+.rule-head .no{font-family:var(--font-title);color:var(--red);font-size:22px;min-width:36px}
+.rule-head h3{flex:1;font-size:17px;font-weight:600}.rule-head .plus{color:var(--red-soft);font-size:22px;transition:transform .3s}
+.rule-item.open .plus{transform:rotate(45deg)}.rule-body{max-height:0;overflow:hidden;transition:max-height .4s ease}
+.rule-body p{padding:0 22px 22px 74px;color:var(--ink-dim);font-size:14px}
+.rules-deco{position:absolute;font-size:60px;opacity:.08;pointer-events:none}
+.reviews-col{columns:2;column-gap:22px}
+.review-card{break-inside:avoid;margin-bottom:22px;background:var(--black-2);border:1px solid rgba(255,255,255,.08);border-radius:12px;overflow:hidden;transition:.3s;cursor:pointer}
+.review-card:hover{transform:translateY(-6px);border-color:var(--line);box-shadow:0 18px 40px rgba(200,16,46,.2)}
+.review-card img{width:100%;aspect-ratio:3/4;object-fit:cover}.review-body{padding:16px 18px}
+.review-top{display:flex;justify-content:space-between;align-items:baseline}
+.review-top .no{font-family:var(--font-title);color:var(--red);font-size:20px}
+.review-top .stars{color:var(--red-soft);letter-spacing:2px;font-size:13px}
+.review-body p{color:var(--ink-dim);font-size:13px;margin:10px 0 12px}
+.tags{display:flex;flex-wrap:wrap;gap:8px}.tag{font-size:11px;padding:3px 10px;border-radius:20px;border:1px solid var(--line);color:var(--red-soft)}
+.head-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.head-card{position:relative;border-radius:12px;overflow:hidden;cursor:pointer;border:1px solid rgba(255,255,255,.08);transition:.35s}
+.head-card img{width:100%;aspect-ratio:3/4;object-fit:cover;transition:.6s}
+.head-card:hover{border-color:var(--red);box-shadow:0 0 40px rgba(200,16,46,.35)}.head-card:hover img{transform:scale(1.06)}
+.head-card .overlay{position:absolute;left:0;right:0;bottom:0;padding:24px 20px;background:linear-gradient(0deg,rgba(10,7,8,.96),transparent)}
+.head-card .overlay .h-no{color:var(--red-soft);font-size:13px;letter-spacing:3px}
+.head-card .overlay h3{font-family:var(--font-title);font-size:26px;margin:4px 0 10px}
+.wall-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.brick{position:relative;border-radius:8px;overflow:hidden;cursor:pointer;border:1px solid rgba(255,255,255,.08);transition:.3s;background:var(--black-2)}
+.brick img{width:100%;aspect-ratio:1/1;object-fit:cover;opacity:.9;transition:.4s}
+.brick:hover{transform:translateY(-6px);border-color:var(--red);box-shadow:0 16px 30px rgba(200,16,46,.3)}
+.brick:hover img{opacity:1;transform:scale(1.05)}.brick .b-info{padding:12px 12px 14px}
+.brick .b-info .b-no{color:var(--red);font-size:12px;letter-spacing:2px;font-family:var(--font-title)}
+.brick .b-info h4{font-size:14px;margin:4px 0}.brick .b-info p{font-size:11px;color:var(--ink-dim)}
+.menu{display:flex;flex-direction:column;gap:26px;max-width:760px;margin:0 auto}
+.menu-deco{text-align:center;color:var(--red);letter-spacing:6px;margin-bottom:10px;font-size:13px}
+.menu-deco::before,.menu-deco::after{content:"—";margin:0 12px;color:var(--red-dim)}
+.tier{border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:26px 28px;background:var(--black-2);position:relative;transition:.3s}
+.tier:hover{border-color:var(--line);box-shadow:0 0 30px rgba(200,16,46,.12)}
+.tier.feature{border-color:var(--red);background:linear-gradient(180deg,rgba(200,16,46,.1),var(--black-2))}
+.tier .tier-head{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px dashed var(--line);padding-bottom:14px;margin-bottom:16px}
+.tier .tier-head h3{font-family:var(--font-title);font-size:24px}
+.tier .tier-head .price{font-family:var(--font-title);font-size:30px;color:var(--red)}
+.tier .tier-head .price small{font-size:13px;color:var(--ink-dim);font-weight:normal}
+.tier ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.tier ul li{display:flex;gap:10px;color:var(--ink-dim);font-size:14px}
+.tier ul li::before{content:"◆";color:var(--red);font-size:11px;margin-top:5px}
+.tier .note{margin-top:14px;font-size:12px;color:var(--ink-dim);border-top:1px solid rgba(255,255,255,.06);padding-top:12px}
+.order-btn{display:block;width:fit-content;margin:40px auto 0;padding:16px 48px;background:var(--red);color:#fff;border-radius:40px;letter-spacing:2px;font-size:15px;transition:.3s}
+.order-btn:hover{background:var(--red-soft);box-shadow:0 0 40px rgba(200,16,46,.7);transform:translateY(-2px)}
+.lightbox{position:fixed;inset:0;z-index:100;display:none;background:rgba(4,3,4,.94);backdrop-filter:blur(4px);align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:24px}
+.lightbox.show{display:flex}.lightbox .lb-img{max-width:min(86vw,720px);max-height:76vh;border:1px solid var(--line);box-shadow:0 0 60px rgba(200,16,46,.35);object-fit:contain;background:#000}
+.lightbox .lb-cap{color:var(--ink-dim);font-size:14px;letter-spacing:1px}.lightbox .lb-cap b{color:var(--red-soft)}
+.lb-btn{position:absolute;top:50%;transform:translateY(-50%);width:54px;height:54px;border-radius:50%;border:1px solid var(--line);background:rgba(200,16,46,.15);color:#fff;font-size:24px;cursor:pointer;transition:.2s}
+.lb-btn:hover{background:rgba(200,16,46,.45)}.lb-prev{left:24px}.lb-next{right:24px}
+.lb-close{position:absolute;top:20px;right:20px;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:none;color:#fff;font-size:20px;cursor:pointer}
+.lb-close:hover{background:var(--red-dim)}
+@media(max-width:860px){.nav-groups{display:none}.burger{display:block}.lightbox .lb-btn{width:44px;height:44px;font-size:20px}.lb-prev{left:8px}.lb-next{right:8px}}
+@media(max-width:760px){.about-wrap{grid-template-columns:1fr}}
+@media(max-width:560px){.grid-scripts{grid-template-columns:1fr}.reviews-col{columns:1}.head-grid{grid-template-columns:1fr}}
+@media(max-width:860px){.wall-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="logo" onclick="go('home')">VIN <b>NOIR</b></a>
+  <div class="nav-right">
+    <div class="nav-groups">
+      <div class="nav-group"><span>关于</span><div class="nav-drop">
+        <a onclick="go('about')">自介</a><a onclick="go('rules')">须知</a></div></div>
+      <div class="nav-group"><span>展示</span><div class="nav-drop">
+        <a onclick="go('scripts')">话术</a><a onclick="go('reviews')">板评</a>
+        <a onclick="go('signature')">头牌</a><a onclick="go('sponsors')">冠名</a></div></div>
+      <div class="nav-group"><span onclick="go('pricing')">价格</span></div>
+    </div>
+    <button class="music-btn" title="背景音乐">♪</button>
+    <button class="burger">☰</button>
+  </div>
+</nav>
+<div class="mobile-menu">
+  <h4>关于</h4><a onclick="go('about')">自介</a><a onclick="go('rules')">须知</a>
+  <h4>展示</h4><a onclick="go('scripts')">话术</a><a onclick="go('reviews')">板评</a>
+  <a onclick="go('signature')">头牌</a><a onclick="go('sponsors')">冠名</a>
+  <h4>价格</h4><a onclick="go('pricing')">价格</a>
+</div>
+
+<!-- 首页 -->
+<section class="view active" id="view-home">
+  <section class="hero">
+    <div class="tag">NOIR · 品酒档案</div>
+    <h1>黑夜里，<br><em>红色</em>会说话</h1>
+    <p>品的是酒，见的是人。这里记录我对风味的理解、圈层的规则，以及值得举杯的时刻。18–22 岁，理性品鉴，适度微醺。</p>
+    <a class="cta" onclick="go('about')">进入档案 →</a>
+  </section>
+  <section class="intro-block">
+    <h2>一杯入喉，风格自现</h2>
+    <p>这是一个把品酒当作语言的作品集：话术教我表达，板评记录判断，头牌收藏高光，冠名留下同行者。往下走，你会看到完整的一套。</p>
+  </section>
+  <section class="cards-grid">
+    <a class="entry-card" onclick="go('about')"><div class="num">01</div><h3>自介</h3><p>我是谁，我的风格宣言</p></a>
+    <a class="entry-card" onclick="go('scripts')"><div class="num">02</div><h3>话术</h3><p>表达与描述的语言库</p></a>
+    <a class="entry-card" onclick="go('rules')"><div class="num">03</div><h3>须知</h3><p>品鉴前后的规则</p></a>
+    <a class="entry-card" onclick="go('reviews')"><div class="num">04</div><h3>板评</h3><p>带评分的品鉴笔记</p></a>
+    <a class="entry-card" onclick="go('signature')"><div class="num">05</div><h3>头牌</h3><p>招牌之作的卡面</p></a>
+    <a class="entry-card" onclick="go('sponsors')"><div class="num">06</div><h3>冠名</h3><p>同行者赞助墙</p></a>
+    <a class="entry-card" onclick="go('pricing')"><div class="num">07</div><h3>价格</h3><p>三档品鉴价目表</p></a>
+  </section>
+</section>
+
+<!-- 自介 -->
+<section class="view" id="view-about">
+  <div class="page">
+    <div class="page-head"><div class="kicker">ABOUT</div><h1>关于<em>我</em></h1><p class="sub">一个把品酒当作表达方式的人。</p></div>
+    <div class="about-wrap">
+      <div class="about-img"><img id="aboutImg" alt="品酒主题图"></div>
+      <div class="about-text"><h2>风格宣言</h2>
+        <p>我是 VIN NOIR 的主理人，22 岁，习惯在深夜开一瓶酒，用风味记录当天的心情。对我来说，品酒不是炫耀，而是一种把感受说清楚的方式。</p>
+        <p>我偏爱结构清晰、余味干净的红。它像一段好对话：开场有吸引力，中间有层次，结束时让人想再来一次。</p>
+        <p>这个网站是我的品酒档案——话术教我怎么描述，板评记录我的判断，头牌收藏那些值得举杯的高光，冠名留下同行的人。</p>
+        <p>如果你也喜欢在黑夜里聊风味，欢迎在下面找到我。</p>
+        <div class="contact-list">
+          <a class="contact-item" href="mailto:hello@vinnoir.example"><span class="ic">✉</span><span>hello@vinnoir.example</span></a>
+          <a class="contact-item"><span class="ic">IG</span><span>@vin.noir</span></a>
+          <a class="contact-item"><span class="ic">微</span><span>vinnoir_2026（备注“品酒”）</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 话术 -->
+<section class="view" id="view-scripts">
+  <div class="page">
+    <div class="page-head"><div class="kicker">SCRIPTS</div><h1>话术 <em>/ 语言库</em></h1><p class="sub">把风味说清楚，是第一口之后的第二件事。点击图片放大，可左右切换。</p></div>
+    <div class="grid-scripts" id="grid-scripts"></div>
+  </div>
+</section>
+
+<!-- 须知 -->
+<section class="view" id="view-rules">
+  <div class="page">
+    <div class="page-head"><div class="kicker">NOTES</div><h1>须知 <em>/ 规则</em></h1><p class="sub">举杯之前，先读这几条。点击标题展开。</p></div>
+    <div class="rules-list">
+      <span class="rules-deco" style="top:-30px;right:10px">🍷</span><span class="rules-deco" style="bottom:-20px;left:0">🏷</span>
+      <div class="rule-item"><div class="rule-head"><span class="no">01</span><h3>饮用前须知</h3><span class="plus">+</span></div><div class="rule-body"><p>请确认已满 18 周岁。品鉴前避免空腹，建议先吃少量碳水。开车不喝酒，喝酒不开车——这条没有例外。</p></div></div>
+      <div class="rule-item"><div class="rule-head"><span class="no">02</span><h3>品鉴礼仪</h3><span class="plus">+</span></div><div class="rule-body"><p>先观色、再闻香、后入口。小口慢品，别急着下结论。与他人交流时先描述感受，再给判断，尊重每个人的味觉差异。</p></div></div>
+      <div class="rule-item"><div class="rule-head"><span class="no">03</span><h3>圈层规则</h3><span class="plus">+</span></div><div class="rule-body"><p>这里欢迎 18–22 岁的同好。不劝酒、不灌酒、不拿酒量论高低。拍照前先征得同席同意，圈内内容不外传。</p></div></div>
+      <div class="rule-item"><div class="rule-head"><span class="no">04</span><h3>免责声明</h3><span class="plus">+</span></div><div class="rule-body"><p>站内所有品鉴笔记均为个人主观感受，不构成任何健康或消费建议。理性品鉴，适度微醺。未成年人禁止饮酒。</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 板评 -->
+<section class="view" id="view-reviews">
+  <div class="page">
+    <div class="page-head"><div class="kicker">TASTING NOTES</div><h1>板评 <em>/ 笔记</em></h1><p class="sub">带评分的品鉴记录。点击卡片放大，可左右切换。</p></div>
+    <div class="reviews-col" id="rev-list"></div>
+  </div>
+</section>
+
+<!-- 头牌 -->
+<section class="view" id="view-signature">
+  <div class="page">
+    <div class="page-head"><div class="kicker">HEADLINERS</div><h1>头牌 <em>/ 卡面</em></h1><p class="sub">招牌之作，收藏级卡面。点击放大，可左右切换。</p></div>
+    <div class="head-grid" id="head-list"></div>
+  </div>
+</section>
+
+<!-- 冠名 -->
+<section class="view" id="view-sponsors">
+  <div class="page">
+    <div class="page-head"><div class="kicker">SPONSORS</div><h1>冠名 <em>/ 赞助墙</em></h1><p class="sub">感谢每一位同行者。点击方块放大，可左右切换。</p></div>
+    <div class="wall-grid" id="wall-list"></div>
+  </div>
+</section>
+
+<!-- 价格 -->
+<section class="view" id="view-pricing">
+  <div class="page">
+    <div class="page-head" style="text-align:center"><div class="kicker">THE MENU</div><h1>价格 <em>/ 酒单</em></h1><p class="sub" style="margin:14px auto 0">三档品鉴，按需选择。</p></div>
+    <div class="menu" id="menu-list"><div class="menu-deco">NOIR TASTING MENU</div></div>
+    <a class="order-btn" href="mailto:hello@vinnoir.example?subject=品酒预约">联系我 / 下单 →</a>
+  </div>
+</section>
+
+<footer class="footer">© 2026 <span>VIN NOIR</span> · 未成年人禁止饮酒 · 理性品鉴，适度微醺</footer>
+
+<script>
+/* ---------- 占位图 ---------- */
+function ph(label,w=600,h=800){
+  const svg=`<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${h}'>
+    <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
+      <stop offset='0' stop-color='#120c0e'/><stop offset='1' stop-color='#2a0d14'/></linearGradient></defs>
+    <rect width='100%' height='100%' fill='url(#g)'/>
+    <rect x='8' y='8' width='${w-16}' height='${h-16}' fill='none' stroke='#c8102e' stroke-width='2' opacity='.5'/>
+    <text x='50%' y='48%' font-family='Impact,sans-serif' font-size='${Math.min(w,h)*0.28}' fill='#c8102e' text-anchor='middle' dominant-baseline='middle' opacity='.9'>${label}</text>
+    <text x='50%' y='70%' font-family='Helvetica,sans-serif' font-size='${Math.min(w,h)*0.035}' fill='#9a8f8d' text-anchor='middle' letter-spacing='4'>VIN NOIR</text></svg>`;
+  return 'data:image/svg+xml;utf8,'+encodeURIComponent(svg);
+}
+
+/* ---------- 数据 ---------- */
+const DATA={
+  scripts:Array.from({length:8},(_,i)=>({no:String(i+1).padStart(2,'0'),src:ph('S'+(i+1))})),
+  reviews:[
+    {no:'01',stars:'★★★★☆',text:'入口柔顺，红果香气先到，尾段收得干净。',tags:['红果','柔顺']},
+    {no:'02',stars:'★★★★★',text:'结构扎实，单宁有嚼劲，适合慢品。',tags:['结构','陈年']},
+    {no:'03',stars:'★★★☆☆',text:'轻盈易饮，日常口粮之选。',tags:['轻盈','日常']},
+    {no:'04',stars:'★★★★☆',text:'酸度明亮，配餐表现突出。',tags:['高酸','配餐']},
+    {no:'05',stars:'★★★★★',text:'余味悠长，复杂度令人惊喜。',tags:['余味','复杂']},
+    {no:'06',stars:'★★★★☆',text:'平衡感极佳，木桶气息恰到好处。',tags:['平衡','木桶']}
+  ].map((x,i)=>({...x,src:ph('R'+(i+1))})),
+  signature:[
+    {no:'01',name:'夜莺',tags:['头牌','限量']},{no:'02',name:'赤焰',tags:['招牌','热销']},
+    {no:'03',name:'墨石',tags:['经典','稳选']},{no:'04',name:'潮汐',tags:['新品','轻盈']},
+    {no:'05',name:'旧梦',tags:['收藏','陈酿']},{no:'06',name:'绯闻',tags:['话题','限定']}
+  ].map((x,i)=>({...x,src:ph('H'+(i+1))})),
+  sponsors:[
+    {no:'01',name:'NOIR 酒庄',desc:'长期合作'},{no:'02',name:'赤盒工作室',desc:'视觉支持'},
+    {no:'03',name:'深夜酒馆',desc:'场地伙伴'},{no:'04',name:'BLACK LABEL',desc:'联名出品'},
+    {no:'05',name:'红釉陶瓷',desc:'器物赞助'},{no:'06',name:'爵士声场',desc:'音乐支持'},
+    {no:'07',name:'VIN 学院',desc:'知识顾问'},{no:'08',name:'干杯基金',desc:'活动资助'}
+  ].map((x,i)=>({...x,src:ph('C'+(i+1))})),
+  pricing:[
+    {name:'基础档',price:'199',unit:'/次',feature:false,items:['1 款精选品鉴','基础风味讲解','现场品鉴笔记','合影留念'],note:'适合初次体验，单次约 60 分钟'},
+    {name:'进阶档',price:'599',unit:'/次',feature:true,items:['3 款对比品鉴','风味轮专业讲解','配餐小食','专属品鉴卡','电子版笔记'],note:'最受欢迎，单次约 120 分钟'},
+    {name:'定制档',price:'面议',unit:'',feature:false,items:['全程定制选品','私享场地','专属讲解师','定制酒标','影像记录'],note:'按需求报价，支持活动/生日/圈子聚会'}
+  ]
+};
+
+/* ---------- 背景酒杯 ---------- */
+const bg=document.createElement('div');bg.className='bg-glass';
+bg.innerHTML=`<svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg">
+  <path d="M60 20 C60 20 58 110 100 150 C142 110 140 20 140 20 Z" fill="#c8102e"/>
+  <path d="M100 150 L100 220" stroke="#c8102e" stroke-width="6"/>
+  <ellipse cx="100" cy="228" rx="46" ry="10" fill="#c8102e"/>
+  <path d="M60 20 L140 20" stroke="#c8102e" stroke-width="6"/></svg>`;
+const veil=document.createElement('div');veil.className='bg-veil';
+document.body.prepend(bg);document.body.prepend(veil);
+
+/* ---------- 渲染列表 ---------- */
+document.getElementById('aboutImg').src=ph('ABOUT',700,900);
+
+const gs=document.getElementById('grid-scripts');
+DATA.scripts.forEach((it,i)=>{const d=document.createElement('div');d.className='item';
+  d.innerHTML=`<img src="${it.src}" alt="话术${it.no}"><div class="big-num">${it.no}</div><div class="bar"></div>`;
+  d.onclick=()=>openLB(DATA.scripts,i);gs.appendChild(d);});
+
+const rv=document.getElementById('rev-list');
+DATA.reviews.forEach((it,i)=>{const c=document.createElement('div');c.className='review-card';
+  c.innerHTML=`<img src="${it.src}" alt="板评${it.no}"><div class="review-body">
+    <div class="review-top"><span class="no">No.${it.no}</span><span class="stars">${it.stars}</span></div>
+    <p>${it.text}</p><div class="tags">${it.tags.map(t=>`<span class="tag">#${t}</span>`).join('')}</div></div>`;
+  c.onclick=()=>openLB(DATA.reviews,i);rv.appendChild(c);});
+
+const hd=document.getElementById('head-list');
+DATA.signature.forEach((it,i)=>{const c=document.createElement('div');c.className='head-card';
+  c.innerHTML=`<img src="${it.src}" alt="头牌${it.name}"><div class="overlay">
+    <div class="h-no">No.${it.no}</div><h3>${it.name}</h3>
+    <div class="tags">${it.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div></div>`;
+  c.onclick=()=>openLB(DATA.signature,i);hd.appendChild(c);});
+
+const wl=document.getElementById('wall-list');
+DATA.sponsors.forEach((it,i)=>{const b=document.createElement('div');b.className='brick';
+  b.innerHTML=`<img src="${it.src}" alt="${it.name}"><div class="b-info">
+    <div class="b-no">NO.${it.no}</div><h4>${it.name}</h4><p>${it.desc}</p></div>`;
+  b.onclick=()=>openLB(DATA.sponsors,i);wl.appendChild(b);});
+
+const ml=document.getElementById('menu-list');
+DATA.pricing.forEach(t=>{const d=document.createElement('div');d.className='tier'+(t.feature?' feature':'');
+  d.innerHTML=`<div class="tier-head"><h3>${t.name}</h3><div class="price">¥${t.price}<small>${t.unit}</small></div></div>
+    <ul>${t.items.map(x=>`<li>${x}</li>`).join('')}</ul><div class="note">${t.note}</div>`;
+  ml.appendChild(d);});
+
+/* ---------- 路由 ---------- */
+function go(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  window.scrollTo({top:0,behavior:'instant'});
+  document.querySelector('.mobile-menu').classList.remove('show');
+}
+window.go=go;
+
+/* ---------- 灯箱 ---------- */
+const lb=document.createElement('div');lb.className='lightbox';
+lb.innerHTML=`<button class="lb-close">✕</button><button class="lb-btn lb-prev">‹</button>
+  <img class="lb-img" alt=""><div class="lb-cap"></div><button class="lb-btn lb-next">›</button>`;
+document.body.appendChild(lb);
+const lbImg=lb.querySelector('.lb-img'),lbCap=lb.querySelector('.lb-cap');let lbList=[],lbIdx=0;
+function openLB(list,idx){lbList=list;lbIdx=idx;renderLB();lb.classList.add('show');document.body.style.overflow='hidden';}
+function renderLB(){const it=lbList[lbIdx];lbImg.src=it.src;
+  lbCap.innerHTML=`<b>No.${it.no}</b> · ${it.name||it.text||''} <span style="color:#7a0c1c">(${lbIdx+1}/${lbList.length})</span>`;}
+function closeLB(){lb.classList.remove('show');document.body.style.overflow='';}
+function step(d){lbIdx=(lbIdx+d+lbList.length)%lbList.length;renderLB();}
+lb.querySelector('.lb-close').onclick=closeLB;
+lb.querySelector('.lb-prev').onclick=()=>step(-1);
+lb.querySelector('.lb-next').onclick=()=>step(1);
+lb.addEventListener('click',e=>{if(e.target===lb)closeLB();});
+document.addEventListener('keydown',e=>{if(!lb.classList.contains('show'))return;
+  if(e.key==='Escape')closeLB();if(e.key==='ArrowLeft')step(-1);if(e.key==='ArrowRight')step(1);});
+
+/* ---------- 手风琴 ---------- */
+document.querySelectorAll('.rule-item').forEach(item=>{
+  const head=item.querySelector('.rule-head'),body=item.querySelector('.rule-body');
+  head.addEventListener('click',()=>{
+    const isOpen=item.classList.contains('open');
+    document.querySelectorAll('.rule-item').forEach(o=>{o.classList.remove('open');o.querySelector('.rule-body').style.maxHeight=null;});
+    if(!isOpen){item.classList.add('open');body.style.maxHeight=body.scrollHeight+'px';}
+  });
+});
+
+/* ---------- 汉堡 ---------- */
+document.querySelector('.burger').onclick=()=>document.querySelector('.mobile-menu').classList.toggle('show');
+
+/* ---------- 音乐（留接口） ---------- */
+const AUDIO_CONFIG={src:'',loop:true,volume:0.5,enabled:false};
+const audio=new Audio();audio.loop=AUDIO_CONFIG.loop;audio.volume=AUDIO_CONFIG.volume;let playing=false;
+document.querySelectorAll('.music-btn').forEach(btn=>{
+  btn.onclick=()=>{
+    if(!AUDIO_CONFIG.enabled||!AUDIO_CONFIG.src){alert('音频待接入：把 jazz 音频路径填入 AUDIO_CONFIG.src，并把 enabled 设为 true。');return;}
+    if(!audio.src)audio.src=AUDIO_CONFIG.src;
+    if(playing){audio.pause();btn.textContent='♪';btn.classList.remove('playing');}
+    else{audio.play();btn.textContent='❚❚';btn.classList.add('playing');}
+    playing=!playing;
+  };
+});
+</script>
+</body>
+</html>
